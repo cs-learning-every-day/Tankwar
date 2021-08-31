@@ -1,9 +1,5 @@
 package io.github.xmchxup;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -23,14 +19,14 @@ public class Tank {
 	private boolean stopped;
 	private Direction direction;
 	private boolean up, down, left, right;
-	private boolean isEnemy;
+	private final boolean enemy;
 
 
 	public Tank(int x, int y, boolean enemy, Direction direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
-		this.isEnemy = enemy;
+		this.enemy = enemy;
 	}
 
 	public Tank(int x, int y, Direction direction) {
@@ -144,24 +140,24 @@ public class Tank {
 	}
 
 	public Optional<Image> getImage() {
-		String prefix = isEnemy ? "e" : "";
+		String prefix = enemy ? "e" : "";
 		switch (direction) {
 			case UP:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankU.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankU.gif"));
 			case DOWN:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankD.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankD.gif"));
 			case LEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankL.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankL.gif"));
 			case RIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankR.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankR.gif"));
 			case UPLEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankLU.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankLU.gif"));
 			case UPRIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankRU.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankRU.gif"));
 			case DOWNLEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankLD.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankLD.gif"));
 			case DOWNRIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankRD.gif").getImage());
+				return Optional.of(Tools.getImage(prefix + "tankRD.gif"));
 		}
 		return Optional.empty();
 	}
