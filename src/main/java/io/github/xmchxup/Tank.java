@@ -23,12 +23,18 @@ public class Tank {
 	private boolean stopped;
 	private Direction direction;
 	private boolean up, down, left, right;
+	private boolean isEnemy;
 
 
-	public Tank(int x, int y, Direction direction) {
+	public Tank(int x, int y, boolean enemy, Direction direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
+		this.isEnemy = enemy;
+	}
+
+	public Tank(int x, int y, Direction direction) {
+		this(x, y, false, direction);
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -66,7 +72,6 @@ public class Tank {
 		}
 		this.determineDirection();
 	}
-
 
 	public void draw(Graphics g) {
 		this.determineDirection();
@@ -138,23 +143,24 @@ public class Tank {
 	}
 
 	public Optional<Image> getImage() {
+		String prefix = isEnemy ? "e" : "";
 		switch (direction) {
 			case UP:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankU.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankU.gif").getImage());
 			case DOWN:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankD.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankD.gif").getImage());
 			case LEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankL.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankL.gif").getImage());
 			case RIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankR.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankR.gif").getImage());
 			case UPLEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankLU.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankLU.gif").getImage());
 			case UPRIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankRU.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankRU.gif").getImage());
 			case DOWNLEFT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankLD.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankLD.gif").getImage());
 			case DOWNRIGHT:
-				return Optional.of(new ImageIcon(IMG_PREFIX + "tankRD.gif").getImage());
+				return Optional.of(new ImageIcon(IMG_PREFIX + prefix + "tankRD.gif").getImage());
 		}
 		return Optional.empty();
 	}
