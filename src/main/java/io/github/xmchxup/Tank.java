@@ -20,7 +20,7 @@ public class Tank {
 	private final int speed;
 
 
-	public Tank(int x, int y, boolean enemy, int speed, Direction direction) {
+	Tank(int x, int y, boolean enemy, int speed, Direction direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
@@ -28,11 +28,11 @@ public class Tank {
 		this.speed = speed;
 	}
 
-	public Tank(int x, int y, Direction direction) {
+	Tank(int x, int y, Direction direction) {
 		this(x, y, false, GameConfig.PLAYER_SPEED, direction);
 	}
 
-	public void keyPressed(KeyEvent e) {
+	void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
 				up = true;
@@ -50,7 +50,7 @@ public class Tank {
 		this.determineDirection();
 	}
 
-	public void keyReleased(KeyEvent e) {
+	void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
 				up = false;
@@ -68,7 +68,8 @@ public class Tank {
 		this.determineDirection();
 	}
 
-	public void draw(Graphics g) {
+	void draw(Graphics g) {
+		int oldX = x, oldY = y;
 		this.determineDirection();
 		this.move();
 
@@ -88,7 +89,30 @@ public class Tank {
 			y = GameConfig.WINDOW_HEIGHT - image.getHeight(null);
 		}
 
+		Rectangle rec = this.getRectangle();
+		GameClient client = GameClient.getInstance();
+		for (Wall wall : client.getWalls()) {
+			if (rec.intersects(wall.getRectangle())) {
+				x = oldX;
+				y = oldY;
+				break;
+			}
+		}
+
+		for (Tank tank : client.getEnemyTanks()) {
+			if (rec.intersects(tank.getRectangle())) {
+				x = oldX;
+				y = oldY;
+				break;
+			}
+		}
+
 		g.drawImage(image, this.x, this.y, null);
+	}
+
+	private Rectangle getRectangle() {
+		Image image = getImage().orElseThrow();
+		return new Rectangle(x, y, image.getWidth(null), image.getHeight(null));
 	}
 
 	private void determineDirection() {
@@ -117,7 +141,7 @@ public class Tank {
 		this.stopped = false;
 	}
 
-	public void move() {
+	private void move() {
 		if (this.stopped) return;
 
 		switch (direction) {
@@ -173,21 +197,5 @@ public class Tank {
 				return Optional.of(Tools.getImage(prefix + "tankRD.gif"));
 		}
 		return Optional.empty();
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public void setY(int y) {
-		this.y = y;
 	}
 }

@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class GameClient extends JComponent {
 
+	private static final GameClient INSTANCE = new GameClient();
+
 	private final Tank playerTank;
 	private final List<Tank> enemyTanks;
 	private final List<Wall> walls;
@@ -31,7 +33,19 @@ public class GameClient extends JComponent {
 						GameConfig.ENEMY_SPEED, Direction.UP));
 			}
 		}
-		this.setPreferredSize(new Dimension(800, 600));
+		this.setPreferredSize(new Dimension(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT));
+	}
+
+	public static GameClient getInstance() {
+		return INSTANCE;
+	}
+
+	List<Tank> getEnemyTanks() {
+		return enemyTanks;
+	}
+
+	List<Wall> getWalls() {
+		return walls;
 	}
 
 	@Override
@@ -53,7 +67,7 @@ public class GameClient extends JComponent {
 		frame.setTitle("坦克大战！");
 		frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());
 
-		GameClient client = new GameClient();
+		GameClient client = GameClient.getInstance();
 		client.repaint();
 
 		frame.addKeyListener(new KeyAdapter() {
