@@ -13,11 +13,11 @@ public class TankTest {
 	@Test
 	void getImage() {
 		for (Direction direction : Direction.values()) {
-			Tank tank = new Tank(0, 0, false, direction);
+			Tank tank = new Tank(0, 0, false, GameConfig.PLAYER_SPEED, direction);
 			assertTrue(tank.getImage().isPresent(),
 					direction + " cannot get valid image!");
 
-			Tank enemyTank = new Tank(0, 0, true, direction);
+			Tank enemyTank = new Tank(0, 0, true, GameConfig.ENEMY_SPEED, direction);
 			assertTrue(tank.getImage().isPresent(),
 					direction + " cannot get valid image!");
 		}

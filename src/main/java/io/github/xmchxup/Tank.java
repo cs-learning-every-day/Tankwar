@@ -11,26 +11,25 @@ import static io.github.xmchxup.Direction.*;
  * @author xmchx (sunhuayangak47@gmail.com)
  */
 public class Tank {
-	private static final String IMG_PREFIX = "assets/images/";
-	private static final int SPEED = 5;
-
 	private int x;
 	private int y;
 	private boolean stopped;
 	private Direction direction;
 	private boolean up, down, left, right;
 	private final boolean enemy;
+	private final int speed;
 
 
-	public Tank(int x, int y, boolean enemy, Direction direction) {
+	public Tank(int x, int y, boolean enemy, int speed, Direction direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;
 		this.enemy = enemy;
+		this.speed = speed;
 	}
 
 	public Tank(int x, int y, Direction direction) {
-		this(x, y, false, direction);
+		this(x, y, false, GameConfig.PLAYER_SPEED, direction);
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -72,10 +71,24 @@ public class Tank {
 	public void draw(Graphics g) {
 		this.determineDirection();
 		this.move();
-		g.drawImage(this.getImage().orElseThrow(() ->
-						new RuntimeException(direction + " cannot get valid image!")),
-				this.x, this.y,
-				null);
+
+		Image image = this.getImage().orElseThrow(
+				() -> new RuntimeException(direction + " cannot get valid image!"));
+
+		if (x < 0) {
+			x = 0;
+		} else if (x > GameConfig.WINDOW_WIDTH - image.getWidth(null)) {
+			x = GameConfig.WINDOW_WIDTH - image.getWidth(null);
+		}
+
+
+		if (y < 0) {
+			y = 0;
+		} else if (y > GameConfig.WINDOW_HEIGHT - image.getHeight(null)) {
+			y = GameConfig.WINDOW_HEIGHT - image.getHeight(null);
+		}
+
+		g.drawImage(image, this.x, this.y, null);
 	}
 
 	private void determineDirection() {
@@ -109,32 +122,32 @@ public class Tank {
 
 		switch (direction) {
 			case UP:
-				y -= SPEED;
+				y -= speed;
 				break;
 			case DOWN:
-				y += SPEED;
+				y += speed;
 				break;
 			case LEFT:
-				x -= SPEED;
+				x -= speed;
 				break;
 			case RIGHT:
-				x += SPEED;
+				x += speed;
 				break;
 			case UPLEFT:
-				x -= SPEED;
-				y -= SPEED;
+				x -= speed;
+				y -= speed;
 				break;
 			case UPRIGHT:
-				x += SPEED;
-				y -= SPEED;
+				x += speed;
+				y -= speed;
 				break;
 			case DOWNLEFT:
-				x -= SPEED;
-				y += SPEED;
+				x -= speed;
+				y += speed;
 				break;
 			case DOWNRIGHT:
-				x += SPEED;
-				y += SPEED;
+				x += speed;
+				y += speed;
 				break;
 		}
 	}

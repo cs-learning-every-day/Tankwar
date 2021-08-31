@@ -27,7 +27,8 @@ public class GameClient extends JComponent {
 				new Wall(700, 80, false, 15));
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
-				this.enemyTanks.add(new Tank(200 + j * 120, 400 + 40 * i, true, Direction.UP));
+				this.enemyTanks.add(new Tank(200 + j * 120, 400 + 40 * i, true,
+						GameConfig.ENEMY_SPEED, Direction.UP));
 			}
 		}
 		this.setPreferredSize(new Dimension(800, 600));
