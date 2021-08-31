@@ -76,7 +76,8 @@ public class Tank {
 	public void draw(Graphics g) {
 		this.determineDirection();
 		this.move();
-		g.drawImage(this.getImage().orElseThrow(() -> new RuntimeException("draw: no tank image")),
+		g.drawImage(this.getImage().orElseThrow(() ->
+						new RuntimeException(direction + " cannot get valid image!")),
 				this.x, this.y,
 				null);
 	}
