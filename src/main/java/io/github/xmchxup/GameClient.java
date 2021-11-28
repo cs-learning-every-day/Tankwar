@@ -38,7 +38,7 @@ public class GameClient extends JComponent {
 		this.setPreferredSize(new Dimension(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT));
 	}
 
-	synchronized void addMissile(Missile missile) {
+	synchronized void add(Missile missile) {
 		missiles.add(missile);
 	}
 
@@ -74,6 +74,7 @@ public class GameClient extends JComponent {
 	}
 
 	public static void main(String[] args) {
+		com.sun.javafx.application.PlatformImpl.startup(()->{});
 		JFrame frame = new JFrame();
 		frame.setTitle("坦克大战！");
 		frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());

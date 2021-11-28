@@ -1,8 +1,11 @@
 package io.github.xmchxup;
 
-import javax.swing.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Optional;
 
 import static io.github.xmchxup.Direction.*;
@@ -117,7 +120,12 @@ public class Tank {
 		Image image = getImage().orElseThrow();
 		Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
 				y + image.getHeight(null) / 2 - 6, enemy, direction);
-		GameClient.getInstance().addMissile(missile);
+		GameClient.getInstance().add(missile);
+
+		Media sound = new Media(
+				new File("assets/audios/shoot.wav").toURI().toString());
+		MediaPlayer mediaPlayer = new MediaPlayer(sound);
+		mediaPlayer.play();
 	}
 
 	private Rectangle getRectangle() {
