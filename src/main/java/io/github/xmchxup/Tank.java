@@ -34,17 +34,20 @@ public class Tank {
 
 	void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
-			case KeyEvent.VK_UP:
+			case KeyEvent.VK_W:
 				up = true;
 				break;
-			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_S:
 				down = true;
 				break;
-			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_A:
 				left = true;
 				break;
-			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_D:
 				right = true;
+				break;
+			case KeyEvent.VK_J:
+				fire();
 				break;
 		}
 		this.determineDirection();
@@ -52,16 +55,16 @@ public class Tank {
 
 	void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
-			case KeyEvent.VK_UP:
+			case KeyEvent.VK_W:
 				up = false;
 				break;
-			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_S:
 				down = false;
 				break;
-			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_A:
 				left = false;
 				break;
-			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_D:
 				right = false;
 				break;
 		}
@@ -108,6 +111,13 @@ public class Tank {
 		}
 
 		g.drawImage(image, this.x, this.y, null);
+	}
+
+	private void fire() {
+		Image image = getImage().orElseThrow();
+		Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
+				y + image.getHeight(null) / 2 - 6, enemy, direction);
+		GameClient.getInstance().addMissile(missile);
 	}
 
 	private Rectangle getRectangle() {

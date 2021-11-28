@@ -18,10 +18,12 @@ public class GameClient extends JComponent {
 	private final Tank playerTank;
 	private final List<Tank> enemyTanks;
 	private final List<Wall> walls;
+	private final List<Missile> missiles;
 
 	private GameClient() {
 		this.playerTank = new Tank(400, 300, Direction.DOWN);
 		this.enemyTanks = new ArrayList<>(12);
+		this.missiles = new ArrayList<>();
 		this.walls = Arrays.asList(
 				new Wall(200, 140, true, 15),
 				new Wall(200, 540, true, 15),
@@ -34,6 +36,10 @@ public class GameClient extends JComponent {
 			}
 		}
 		this.setPreferredSize(new Dimension(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT));
+	}
+
+	synchronized void addMissile(Missile missile) {
+		missiles.add(missile);
 	}
 
 	public static GameClient getInstance() {
@@ -57,8 +63,13 @@ public class GameClient extends JComponent {
 		for (Tank tank : enemyTanks) {
 			tank.draw(g);
 		}
+
 		for (Wall wall : walls) {
 			wall.draw(g);
+		}
+
+		for (Missile missile : missiles) {
+			missile.draw(g);
 		}
 	}
 
