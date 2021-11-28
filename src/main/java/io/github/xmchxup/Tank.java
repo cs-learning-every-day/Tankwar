@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Optional;
+import java.util.Random;
 
 import static io.github.xmchxup.Direction.*;
 
@@ -52,9 +53,13 @@ public class Tank {
 			case KeyEvent.VK_J:
 				fire();
 				break;
+			case KeyEvent.VK_K:
+				superFire();
+				break;
 		}
 		this.determineDirection();
 	}
+
 
 	void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
@@ -122,8 +127,26 @@ public class Tank {
 				y + image.getHeight(null) / 2 - 6, enemy, direction);
 		GameClient.getInstance().add(missile);
 
+		playAudio("shoot.wav");
+	}
+
+	private void superFire() {
+		Image image;
+		for (Direction direction : Direction.values()) {
+			image = getImage().orElseThrow();
+
+			Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
+					y + image.getHeight(null) / 2 - 6, enemy, direction);
+			GameClient.getInstance().add(missile);
+		}
+
+		String audioFile = new Random().nextBoolean() ? "supershoot.aiff" : "supershoot.wav";
+		playAudio(audioFile);
+	}
+
+	private void playAudio(String filename) {
 		Media sound = new Media(
-				new File("assets/audios/shoot.wav").toURI().toString());
+				new File("assets/audios/" + filename).toURI().toString());
 		MediaPlayer mediaPlayer = new MediaPlayer(sound);
 		mediaPlayer.play();
 	}
@@ -148,13 +171,13 @@ public class Tank {
 		} else if (!up && !down && !left && right) {
 			this.direction = RIGHT;
 		} else if (up && !down && left && !right) {
-			this.direction = UPLEFT;
+			this.direction = LEFT_UP;
 		} else if (up && !down && !left && right) {
-			this.direction = UPRIGHT;
+			this.direction = RIGHT_UP;
 		} else if (!up && down && left && !right) {
-			this.direction = DOWNLEFT;
+			this.direction = LEFT_DOWN;
 		} else if (!up && down && !left && right) {
-			this.direction = DOWNRIGHT;
+			this.direction = RIGHT_DOWN;
 		}
 		this.stopped = false;
 	}
@@ -175,19 +198,19 @@ public class Tank {
 			case RIGHT:
 				x += speed;
 				break;
-			case UPLEFT:
+			case LEFT_UP:
 				x -= speed;
 				y -= speed;
 				break;
-			case UPRIGHT:
+			case RIGHT_UP:
 				x += speed;
 				y -= speed;
 				break;
-			case DOWNLEFT:
+			case LEFT_DOWN:
 				x -= speed;
 				y += speed;
 				break;
-			case DOWNRIGHT:
+			case RIGHT_DOWN:
 				x += speed;
 				y += speed;
 				break;
@@ -196,24 +219,6 @@ public class Tank {
 
 	public Optional<Image> getImage() {
 		String prefix = enemy ? "e" : "";
-		switch (direction) {
-			case UP:
-				return Optional.of(Tools.getImage(prefix + "tankU.gif"));
-			case DOWN:
-				return Optional.of(Tools.getImage(prefix + "tankD.gif"));
-			case LEFT:
-				return Optional.of(Tools.getImage(prefix + "tankL.gif"));
-			case RIGHT:
-				return Optional.of(Tools.getImage(prefix + "tankR.gif"));
-			case UPLEFT:
-				return Optional.of(Tools.getImage(prefix + "tankLU.gif"));
-			case UPRIGHT:
-				return Optional.of(Tools.getImage(prefix + "tankRU.gif"));
-			case DOWNLEFT:
-				return Optional.of(Tools.getImage(prefix + "tankLD.gif"));
-			case DOWNRIGHT:
-				return Optional.of(Tools.getImage(prefix + "tankRD.gif"));
-		}
-		return Optional.empty();
+		return direction.getImage(prefix + "tank");
 	}
 }
