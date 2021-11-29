@@ -128,7 +128,7 @@ public class Tank {
 				y + image.getHeight(null) / 2 - 6, enemy, direction);
 		GameClient.getInstance().add(missile);
 
-		playAudio("shoot.wav");
+		Tools.playAudio("shoot.wav");
 	}
 
 	private void superFire() {
@@ -142,15 +142,9 @@ public class Tank {
 		}
 
 		String audioFile = new Random().nextBoolean() ? "supershoot.aiff" : "supershoot.wav";
-		playAudio(audioFile);
+		Tools.playAudio(audioFile);
 	}
 
-	private void playAudio(String filename) {
-		Media sound = new Media(
-				new File("assets/audios/" + filename).toURI().toString());
-		MediaPlayer mediaPlayer = new MediaPlayer(sound);
-		mediaPlayer.play();
-	}
 
 	Rectangle getRectangle() {
 		Image image = getImage().orElseThrow();
