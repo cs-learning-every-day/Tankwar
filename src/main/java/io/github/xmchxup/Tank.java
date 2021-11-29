@@ -22,6 +22,8 @@ public class Tank {
 	private boolean up, down, left, right;
 	private final boolean enemy;
 	private final int speed;
+	private boolean live = true;
+	private int hp = 100;
 
 
 	Tank(int x, int y, boolean enemy, int speed, Direction direction) {
@@ -59,7 +61,6 @@ public class Tank {
 		}
 		this.determineDirection();
 	}
-
 
 	void keyReleased(KeyEvent e) {
 		switch (e.getKeyCode()) {
@@ -151,7 +152,7 @@ public class Tank {
 		mediaPlayer.play();
 	}
 
-	private Rectangle getRectangle() {
+	Rectangle getRectangle() {
 		Image image = getImage().orElseThrow();
 		return new Rectangle(x, y, image.getWidth(null), image.getHeight(null));
 	}
@@ -188,8 +189,28 @@ public class Tank {
 		y += direction.yFactor * speed;
 	}
 
-	public Optional<Image> getImage() {
+	Optional<Image> getImage() {
 		String prefix = enemy ? "e" : "";
 		return direction.getImage(prefix + "tank");
+	}
+
+	boolean isLive() {
+		return live;
+	}
+
+	void setLive(boolean live) {
+		this.live = live;
+	}
+
+	int getHp() {
+		return hp;
+	}
+
+	void setHp(int hp) {
+		this.hp = hp;
+	}
+
+	boolean isEnemy() {
+		return enemy;
 	}
 }
