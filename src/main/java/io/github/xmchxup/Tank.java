@@ -184,37 +184,8 @@ public class Tank {
 
 	private void move() {
 		if (this.stopped) return;
-
-		switch (direction) {
-			case UP:
-				y -= speed;
-				break;
-			case DOWN:
-				y += speed;
-				break;
-			case LEFT:
-				x -= speed;
-				break;
-			case RIGHT:
-				x += speed;
-				break;
-			case LEFT_UP:
-				x -= speed;
-				y -= speed;
-				break;
-			case RIGHT_UP:
-				x += speed;
-				y -= speed;
-				break;
-			case LEFT_DOWN:
-				x -= speed;
-				y += speed;
-				break;
-			case RIGHT_DOWN:
-				x += speed;
-				y += speed;
-				break;
-		}
+		x += direction.xFactor * speed;
+		y += direction.yFactor * speed;
 	}
 
 	public Optional<Image> getImage() {
