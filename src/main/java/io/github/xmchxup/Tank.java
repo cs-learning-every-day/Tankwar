@@ -15,231 +15,260 @@ import static io.github.xmchxup.Direction.*;
  * @author xmchx (sunhuayangak47@gmail.com)
  */
 public class Tank {
-	private int x;
-	private int y;
-	private boolean stopped;
-	private Direction direction;
-	private boolean up, down, left, right;
-	private final boolean enemy;
-	private final int speed;
-	private boolean live = true;
-	private int hp = 100;
+    private static final int MAX_HP = 100;
+    private int x;
+    private int y;
+    private boolean stopped;
+    private Direction direction;
+    private boolean up, down, left, right;
+    private final boolean enemy;
+    private final int speed;
+    private boolean live = true;
+    private int hp = MAX_HP;
 
 
-	Tank(int x, int y, boolean enemy, int speed, Direction direction) {
-		this.x = x;
-		this.y = y;
-		this.direction = direction;
-		this.enemy = enemy;
-		this.speed = speed;
-	}
+    Tank(int x, int y, boolean enemy, int speed, Direction direction) {
+        this.x = x;
+        this.y = y;
+        this.direction = direction;
+        this.enemy = enemy;
+        this.speed = speed;
+    }
 
-	Tank(int x, int y, Direction direction) {
-		this(x, y, false, GameConfig.PLAYER_SPEED, direction);
-	}
+    Tank(int x, int y, Direction direction) {
+        this(x, y, false, GameConfig.PLAYER_SPEED, direction);
+    }
 
-	void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_W:
-				up = true;
-				break;
-			case KeyEvent.VK_S:
-				down = true;
-				break;
-			case KeyEvent.VK_A:
-				left = true;
-				break;
-			case KeyEvent.VK_D:
-				right = true;
-				break;
-			case KeyEvent.VK_J:
-				fire();
-				break;
-			case KeyEvent.VK_K:
-				superFire();
-				break;
-			case KeyEvent.VK_U:
-				GameClient.getInstance().restart();
-				break;
-		}
-		this.determineDirection();
-	}
+    void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W:
+                up = true;
+                break;
+            case KeyEvent.VK_S:
+                down = true;
+                break;
+            case KeyEvent.VK_A:
+                left = true;
+                break;
+            case KeyEvent.VK_D:
+                right = true;
+                break;
+            case KeyEvent.VK_J:
+                fire();
+                break;
+            case KeyEvent.VK_K:
+                superFire();
+                break;
+            case KeyEvent.VK_U:
+                GameClient.getInstance().restart();
+                break;
+        }
+        this.determineDirection();
+    }
 
-	void keyReleased(KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_W:
-				up = false;
-				break;
-			case KeyEvent.VK_S:
-				down = false;
-				break;
-			case KeyEvent.VK_A:
-				left = false;
-				break;
-			case KeyEvent.VK_D:
-				right = false;
-				break;
-		}
-		this.determineDirection();
-	}
+    void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W:
+                up = false;
+                break;
+            case KeyEvent.VK_S:
+                down = false;
+                break;
+            case KeyEvent.VK_A:
+                left = false;
+                break;
+            case KeyEvent.VK_D:
+                right = false;
+                break;
+        }
+        this.determineDirection();
+    }
 
-	void draw(Graphics g) {
-		int oldX = x, oldY = y;
-		if (!this.enemy) {
-			this.determineDirection();
-		}
-		this.move();
+    void draw(Graphics g) {
+        int oldX = x, oldY = y;
+        if (!this.enemy) {
+            this.determineDirection();
+        }
+        this.move();
 
-		Image image = this.getImage().orElseThrow(
-				() -> new RuntimeException(direction + " cannot get valid image!"));
+        Image image = this.getImage().orElseThrow(
+                () -> new RuntimeException(direction + " cannot get valid image!"));
 
-		if (x < 0) {
-			x = 0;
-		} else if (x > GameConfig.WINDOW_WIDTH - image.getWidth(null)) {
-			x = GameConfig.WINDOW_WIDTH - image.getWidth(null);
-		}
+        if (x < 0) {
+            x = 0;
+        } else if (x > GameConfig.WINDOW_WIDTH - image.getWidth(null)) {
+            x = GameConfig.WINDOW_WIDTH - image.getWidth(null);
+        }
 
 
-		if (y < 0) {
-			y = 0;
-		} else if (y > GameConfig.WINDOW_HEIGHT - image.getHeight(null)) {
-			y = GameConfig.WINDOW_HEIGHT - image.getHeight(null);
-		}
+        if (y < 0) {
+            y = 0;
+        } else if (y > GameConfig.WINDOW_HEIGHT - image.getHeight(null)) {
+            y = GameConfig.WINDOW_HEIGHT - image.getHeight(null);
+        }
 
-		Rectangle rec = this.getRectangle();
-		GameClient client = GameClient.getInstance();
-		for (Wall wall : client.getWalls()) {
-			if (rec.intersects(wall.getRectangle())) {
-				x = oldX;
-				y = oldY;
-				break;
-			}
-		}
+        Rectangle rec = this.getRectangle();
+        GameClient client = GameClient.getInstance();
+        for (Wall wall : client.getWalls()) {
+            if (rec.intersects(wall.getRectangle())) {
+                x = oldX;
+                y = oldY;
+                break;
+            }
+        }
 
-		for (Tank tank : client.getEnemyTanks()) {
-			if (tank != this && rec.intersects(tank.getRectangle())) {
-				x = oldX;
-				y = oldY;
-				break;
-			}
-		}
+        for (Tank tank : client.getEnemyTanks()) {
+            if (tank != this && rec.intersects(tank.getRectangle())) {
+                x = oldX;
+                y = oldY;
+                break;
+            }
+        }
 
-		if (this.enemy && rec.intersects(
-				GameClient.getInstance().getPlayerTank().getRectangle())) {
-			x = oldX;
-			y = oldY;
-		}
+        if (this.enemy && rec.intersects(
+                GameClient.getInstance().getPlayerTank().getRectangle())) {
+            x = oldX;
+            y = oldY;
+        }
 
-		if (!enemy) {
-			g.setColor(Color.WHITE);
-			g.fillRect(x, y - 10, image.getWidth(null), 10);
+        if (!enemy) {
+            Blood blood = GameClient.getInstance().getBlood();
+            if (blood.isLive() && rec.intersects(blood.getRectangle())) {
+                this.hp = MAX_HP;
+                Tools.playAudio("revive.wav");
+                blood.setLive(false);
+            }
 
-			g.setColor(Color.RED);
-			int width = hp * image.getWidth(null) / 100;
-			g.fillRect(x, y - 10, width, 10);
-		}
+            g.setColor(Color.WHITE);
+            g.fillRect(x, y - 10, image.getWidth(null), 10);
 
-		g.drawImage(image, this.x, this.y, null);
-	}
+            g.setColor(Color.RED);
+            int width = hp * image.getWidth(null) / MAX_HP;
+            g.fillRect(x, y - 10, width, 10);
 
-	private void fire() {
-		Image image = getImage().orElseThrow();
-		Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
-				y + image.getHeight(null) / 2 - 6, enemy, direction);
-		GameClient.getInstance().add(missile);
+            Image petImage = Tools.getImage("pet-camel.gif");
+            g.drawImage(petImage, this.x - petImage.getWidth(null) - DISTANCE_TO_PET, this.y, null);
+        }
 
-		Tools.playAudio("shoot.wav");
-	}
+        g.drawImage(image, this.x, this.y, null);
+    }
 
-	private void superFire() {
-		Image image;
-		for (Direction direction : Direction.values()) {
-			image = getImage().orElseThrow();
+    private void fire() {
+        Image image = getImage().orElseThrow();
+        Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
+                y + image.getHeight(null) / 2 - 6, enemy, direction);
+        GameClient.getInstance().add(missile);
 
-			Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
-					y + image.getHeight(null) / 2 - 6, enemy, direction);
-			GameClient.getInstance().add(missile);
-		}
+        Tools.playAudio("shoot.wav");
+    }
 
-		String audioFile = new Random().nextBoolean() ? "supershoot.aiff" : "supershoot.wav";
-		Tools.playAudio(audioFile);
-	}
+    private void superFire() {
+        Image image;
+        for (Direction direction : Direction.values()) {
+            image = getImage().orElseThrow();
 
-	Rectangle getRectangle() {
-		Image image = getImage().orElseThrow();
-		return new Rectangle(x, y, image.getWidth(null), image.getHeight(null));
-	}
+            Missile missile = new Missile(x + image.getWidth(null) / 2 - 6,
+                    y + image.getHeight(null) / 2 - 6, enemy, direction);
+            GameClient.getInstance().add(missile);
+        }
 
-	private void determineDirection() {
-		if (!up && !down && !left && !right) {
-			this.stopped = true;
-			return;
-		}
+        String audioFile = new Random().nextBoolean() ? "supershoot.aiff" : "supershoot.wav";
+        Tools.playAudio(audioFile);
+    }
 
-		if (up && !down && !left && !right) {
-			this.direction = UP;
-		} else if (!up && down && !left && !right) {
-			this.direction = DOWN;
-		} else if (!up && !down && left && !right) {
-			this.direction = LEFT;
-		} else if (!up && !down && !left && right) {
-			this.direction = RIGHT;
-		} else if (up && !down && left && !right) {
-			this.direction = LEFT_UP;
-		} else if (up && !down && !left && right) {
-			this.direction = RIGHT_UP;
-		} else if (!up && down && left && !right) {
-			this.direction = LEFT_DOWN;
-		} else if (!up && down && !left && right) {
-			this.direction = RIGHT_DOWN;
-		}
-		this.stopped = false;
-	}
+    private static final int DISTANCE_TO_PET = 4;
 
-	private void move() {
-		if (this.stopped) return;
-		x += direction.xFactor * speed;
-		y += direction.yFactor * speed;
-	}
+    Rectangle getRectangle() {
+        Image image = getImage().orElseThrow();
+        if (enemy) {
+            return new Rectangle(x, y, image.getWidth(null), image.getHeight(null));
+        } else {
+            Image petImage = Tools.getImage("pet-camel.gif");
+            int delta = petImage.getWidth(null) + DISTANCE_TO_PET;
+            return new Rectangle(x - delta, y,
+                    image.getWidth(null) + delta, image.getHeight(null));
+        }
+    }
 
-	Optional<Image> getImage() {
-		String prefix = enemy ? "e" : "";
-		return direction.getImage(prefix + "tank");
-	}
+    Rectangle getRectangleForHitDetection() {
+        Image image = getImage().orElseThrow();
+        return new Rectangle(x, y, image.getWidth(null), image.getHeight(null));
+    }
 
-	boolean isLive() {
-		return live;
-	}
+    private void determineDirection() {
+        if (!up && !down && !left && !right) {
+            this.stopped = true;
+            return;
+        }
 
-	void setLive(boolean live) {
-		this.live = live;
-	}
+        if (up && !down && !left && !right) {
+            this.direction = UP;
+        } else if (!up && down && !left && !right) {
+            this.direction = DOWN;
+        } else if (!up && !down && left && !right) {
+            this.direction = LEFT;
+        } else if (!up && !down && !left && right) {
+            this.direction = RIGHT;
+        } else if (up && !down && left && !right) {
+            this.direction = LEFT_UP;
+        } else if (up && !down && !left && right) {
+            this.direction = RIGHT_UP;
+        } else if (!up && down && left && !right) {
+            this.direction = LEFT_DOWN;
+        } else if (!up && down && !left && right) {
+            this.direction = RIGHT_DOWN;
+        }
+        this.stopped = false;
+    }
 
-	int getHp() {
-		return hp;
-	}
+    private void move() {
+        if (this.stopped) return;
+        x += direction.xFactor * speed;
+        y += direction.yFactor * speed;
+    }
 
-	void setHp(int hp) {
-		this.hp = hp;
-	}
+    Optional<Image> getImage() {
+        String prefix = enemy ? "e" : "";
+        return direction.getImage(prefix + "tank");
+    }
 
-	boolean isEnemy() {
-		return enemy;
-	}
+    boolean isLive() {
+        return live;
+    }
 
-	private final Random random = new Random();
+    void setLive(boolean live) {
+        this.live = live;
+    }
 
-	private int step = random.nextInt(12) + 3;
+    int getHp() {
+        return hp;
+    }
 
-	void actRandomly() {
-		Direction[] dirs = Direction.values();
-		if (step == 0) {
-			step = random.nextInt(12) + 3;
-			this.direction = dirs[random.nextInt(dirs.length)];
-			if (random.nextBoolean()) {
-				this.fire();
-			}
-		}
-		step--;
-	}
+    void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    boolean isEnemy() {
+        return enemy;
+    }
+
+    boolean isDying() {
+        return this.hp <= MAX_HP * 0.2;
+    }
+
+    private final Random random = new Random();
+
+    private int step = random.nextInt(12) + 3;
+
+    void actRandomly() {
+        Direction[] dirs = Direction.values();
+        if (step == 0) {
+            step = random.nextInt(12) + 3;
+            this.direction = dirs[random.nextInt(dirs.length)];
+            if (random.nextBoolean()) {
+                this.fire();
+            }
+        }
+        step--;
+    }
 }
