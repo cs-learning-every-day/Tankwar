@@ -1,24 +1,36 @@
 package io.github.xmchxup;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.io.FileUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import io.github.xmchxup.Save.*;
 
 /**
  * @author xmchx (sunhuayangak47@gmail.com)
  */
 public class GameClient extends JComponent {
 
+    private static final String GAME_SAVE = "game.sav";
     private static final GameClient INSTANCE = new GameClient();
+    private static final Random RANDOM = new Random();
     private final AtomicInteger enemyKilled = new AtomicInteger(0);
-    private final static Random RANDOM = new Random();
     private Tank playerTank;
     private List<Tank> enemyTanks;
     private final List<Wall> walls;
@@ -81,7 +93,7 @@ public class GameClient extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, 800, 600);
+        g.fillRect(0, 0, GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT);
 
         if (!playerTank.isLive()) {
             g.setColor(Color.RED);
@@ -142,6 +154,38 @@ public class GameClient extends JComponent {
         this.initEnemyTanks();
     }
 
+    private void load() throws IOException {
+        File file = new File(GAME_SAVE);
+        if (file.exists() && file.isFile()) {
+            String json = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            Save save = JSON.parseObject(json, Save.class);
+            if (save.isGameContinued()) {
+                this.playerTank = new Tank(save.getPlayerPosition(), false);
+
+                this.enemyTanks.clear();
+                List<Position> enemyPositions = save.getEnemyPositions();
+                if (enemyPositions != null && !enemyPositions.isEmpty()) {
+                    for (Position position : enemyPositions) {
+                        this.enemyTanks.add(new Tank(position, true));
+                    }
+                }
+            }
+        }
+    }
+
+    void save(String destination) throws IOException {
+        Save save = new Save(playerTank.isLive(), playerTank.getPosition(),
+                enemyTanks.stream().filter(Tank::isLive)
+                        .map(Tank::getPosition).collect(Collectors.toList()));
+        FileUtils.write(new File(destination),
+                JSON.toJSONString(save, true),
+                StandardCharsets.UTF_8);
+    }
+
+    void save() throws IOException {
+        this.save(GAME_SAVE);
+    }
+
     public static void main(String[] args) {
         com.sun.javafx.application.PlatformImpl.startup(() -> {
         });
@@ -150,7 +194,6 @@ public class GameClient extends JComponent {
         frame.setIconImage(new ImageIcon("assets/images/icon.png").getImage());
 
         GameClient client = GameClient.getInstance();
-        client.repaint();
 
         frame.addKeyListener(new KeyAdapter() {
             @Override
@@ -164,11 +207,31 @@ public class GameClient extends JComponent {
             }
         });
 
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    client.save();
+                    System.exit(0);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Failed to save current game!",
+                            "Oops! Error Occurred", JOptionPane.ERROR_MESSAGE);
+                    System.exit(4);
+                }
+            }
+        });
+
         frame.add(client);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        try {
+            client.load();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Failed to load previous game!",
+                    "Oops! Error Occurred", JOptionPane.ERROR_MESSAGE);
+        }
 
         while (true) {
             try {

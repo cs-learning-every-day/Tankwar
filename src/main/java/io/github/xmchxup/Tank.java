@@ -9,7 +9,10 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Random;
 
+import io.github.xmchxup.Save.*;
+
 import static io.github.xmchxup.Direction.*;
+
 
 /**
  * @author xmchx (sunhuayangak47@gmail.com)
@@ -37,6 +40,14 @@ public class Tank {
 
     Tank(int x, int y, Direction direction) {
         this(x, y, false, GameConfig.PLAYER_SPEED, direction);
+    }
+
+    Tank(Position position, boolean enemy) {
+        this(position.getX(), position.getY(), enemy, position.getDirection());
+    }
+
+    Tank(int x, int y, boolean enemy, Direction direction) {
+        this(x, y, enemy, GameConfig.PLAYER_SPEED, direction);
     }
 
     void keyPressed(KeyEvent e) {
@@ -254,6 +265,10 @@ public class Tank {
 
     boolean isDying() {
         return this.hp <= MAX_HP * 0.2;
+    }
+
+    Position getPosition() {
+        return new Position(x, y, direction);
     }
 
     private final Random random = new Random();
