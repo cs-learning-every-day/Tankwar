@@ -1,11 +1,7 @@
 package io.github.xmchxup;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.Optional;
 import java.util.Random;
 
@@ -23,11 +19,11 @@ public class Tank {
     private int y;
     private boolean stopped;
     private Direction direction;
-    private boolean up, down, left, right;
     private final boolean enemy;
     private final int speed;
     private boolean live = true;
     private int hp = MAX_HP;
+    private int code;
 
 
     Tank(int x, int y, boolean enemy, int speed, Direction direction) {
@@ -53,16 +49,16 @@ public class Tank {
     void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
-                up = true;
+                code |= Direction.UP.code;
                 break;
             case KeyEvent.VK_S:
-                down = true;
+                code |= Direction.DOWN.code;
                 break;
             case KeyEvent.VK_A:
-                left = true;
+                code |= Direction.LEFT.code;
                 break;
             case KeyEvent.VK_D:
-                right = true;
+                code |= Direction.RIGHT.code;
                 break;
             case KeyEvent.VK_J:
                 fire();
@@ -80,16 +76,16 @@ public class Tank {
     void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
-                up = false;
+                code ^= UP.code;
                 break;
             case KeyEvent.VK_S:
-                down = false;
+                code ^= DOWN.code;
                 break;
             case KeyEvent.VK_A:
-                left = false;
+                code ^= LEFT.code;
                 break;
             case KeyEvent.VK_D:
-                right = false;
+                code ^= RIGHT.code;
                 break;
         }
         this.determineDirection();
@@ -97,9 +93,6 @@ public class Tank {
 
     void draw(Graphics g) {
         int oldX = x, oldY = y;
-        if (!this.enemy) {
-            this.determineDirection();
-        }
         this.move();
 
         Image image = this.getImage().orElseThrow(
@@ -207,28 +200,13 @@ public class Tank {
     }
 
     private void determineDirection() {
-        if (!up && !down && !left && !right) {
+        Direction newDirection = Direction.get(code);
+        if (newDirection == null) {
             this.stopped = true;
             return;
         }
 
-        if (up && !down && !left && !right) {
-            this.direction = UP;
-        } else if (!up && down && !left && !right) {
-            this.direction = DOWN;
-        } else if (!up && !down && left && !right) {
-            this.direction = LEFT;
-        } else if (!up && !down && !left && right) {
-            this.direction = RIGHT;
-        } else if (up && !down && left && !right) {
-            this.direction = LEFT_UP;
-        } else if (up && !down && !left && right) {
-            this.direction = RIGHT_UP;
-        } else if (!up && down && left && !right) {
-            this.direction = LEFT_DOWN;
-        } else if (!up && down && !left && right) {
-            this.direction = RIGHT_DOWN;
-        }
+        this.direction = newDirection;
         this.stopped = false;
     }
 

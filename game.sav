@@ -1,40 +1,20 @@
 {
 	"enemyPositions":[
 		{
-			"direction":"RIGHT_DOWN",
-			"x":505,
-			"y":335
-		},
-		{
-			"direction":"LEFT_DOWN",
-			"x":475,
-			"y":295
-		},
-		{
 			"direction":"DOWN",
-			"x":390,
-			"y":445
+			"x":135,
+			"y":425
 		},
 		{
-			"direction":"LEFT_UP",
-			"x":0,
-			"y":385
-		},
-		{
-			"direction":"UP",
-			"x":115,
-			"y":530
-		},
-		{
-			"direction":"RIGHT_UP",
-			"x":185,
+			"direction":"RIGHT_DOWN",
+			"x":440,
 			"y":500
 		}
 	],
 	"gameContinued":true,
 	"playerPosition":{
-		"direction":"DOWN",
-		"x":295,
-		"y":100
+		"direction":"LEFT",
+		"x":445,
+		"y":290
 	}
 }
